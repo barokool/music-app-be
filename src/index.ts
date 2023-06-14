@@ -6,8 +6,11 @@ import cors from "cors";
 import { errorHandler, loggerMiddleware } from "./middlewares";
 import { apiRouter } from "./routes";
 import cookieParser from "cookie-parser";
+import fileUpload from "express-fileupload";
+require("dotenv").config();
 
 const app: Express = express();
+
 app.use(loggerMiddleware);
 
 const corsOptions = {
@@ -24,7 +27,12 @@ app.use(express.json());
 app.use(express.static("public"));
 app.use(cookieParser());
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 app.use("/api", apiRouter);
+
 app.use(errorHandler);
 
 const start = async () => {

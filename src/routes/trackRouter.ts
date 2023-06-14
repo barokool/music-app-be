@@ -8,7 +8,7 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   },
   destination: function (req, file, cb) {
-    cb(null, "./uploads");
+    cb(null, "src/upload");
   },
 });
 
@@ -19,10 +19,11 @@ const trackRouter = Router();
 const trackController = new TrackController();
 
 trackRouter.get("/", trackController.getAllTracks);
+trackRouter.post("/uploaded", upload.single("file"), trackController.upload);
 trackRouter.get("/detail/:slug", trackController.getTrackBySlug);
+trackRouter.get("/audio/:filename", trackController.getFileAudio);
 trackRouter
   .all("/*", authMiddleware)
-  .post("/uploaded", upload.single("file"), trackController.store)
   .delete("/delete/:slug", trackController.delete);
 
 //edit a track
