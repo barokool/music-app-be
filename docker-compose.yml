@@ -1,0 +1,62 @@
+version: "3.7"
+
+services:
+  ts-node-docker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - ./src:/home/node/app/src
+      - ./nodemon.json:/home/node/app/nodemon.json
+    container_name: ts-node-docker
+    ports:
+      - 8000:8000
+    command: npm run dev
+    networks:
+      - network
+    # depends_on:
+    #   - mongo
+    environment:
+      PORT: ${PORT}
+      DB_URL: ${DB_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_TIME: ${JWT_EXPIRATION_TIME}
+      JWT_REFRESH_TOKEN_SECRET: ${JWT_REFRESH_TOKEN_SECRET}
+      JWT_REFRESH_TOKEN_EXPIRATION_TIME: ${JWT_REFRESH_TOKEN_EXPIRATION_TIME}
+      JWT_VERIFICATION_TOKEN_SECRET: ${JWT_VERIFICATION_TOKEN_SECRET}
+      JWT_VERIFICATION_TOKEN_EXPIRATION_TIME: ${JWT_VERIFICATION_TOKEN_EXPIRATION_TIME}
+
+networks:
+  network:
+
+  # mongo:
+  #   container_name: app.mongo.db
+  #   image: mongo:5.0.1
+  #   networks:
+  #     - network
+  #   restart: always
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: password
+  #   ports:
+  #     - 27017:27017
+  #   volumes:
+  #     - mongodb_data:/data/db
+
+  # mongo-express:
+  #   image: mongo-express
+  #   container_name: mexpress
+  #   environment:
+  #     - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+  #     - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+  #     - ME_CONFIG_MONGODB_URL=mongodb://root:password@mongo:27017/?authSource=admin
+  #     - ME_CONFIG_BASICAUTH_USERNAME=mexpress
+  #     - ME_CONFIG_BASICAUTH_PASSWORD=mexpress
+  #   links:
+  #     - mongo
+  #   restart: always
+  #   ports:
+  #     - 8081:8081
+# volumes:
+#   mongodb_data:
