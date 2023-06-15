@@ -99,18 +99,13 @@ class PlaylistController {
       const id = request.params.slug as string;
       const trackSlug = request.params.trackSlug as string;
 
-      console.log(body);
-      console.log(id);
-
-      console.log(trackSlug);
-
       const track = await PlaylistController.trackModel
         .findOne({ slug: trackSlug })
         .populate("author");
 
       if (track) {
         const playlist =
-          await PlaylistController.playlistModel.findByIdAndRemove(id, {
+          await PlaylistController.playlistModel.findByIdAndUpdate(id, {
             $pull: {
               tracks: track._id,
             },
