@@ -64,24 +64,57 @@ class PlaylistController {
   ) {
     try {
       const body = request.body;
-      const id = request.params.id as string;
+      const id = request.params.slug as string;
       const trackSlug = body.slug;
+
       const track = await PlaylistController.trackModel
         .findOne({ slug: trackSlug })
         .populate("author");
 
       if (track) {
         const playlist =
-          await PlaylistController.playlistModel.findOneAndUpdate(
-            {
-              id: id,
+          await PlaylistController.playlistModel.findByIdAndUpdate(id, {
+            $push: {
+              tracks: track._id,
             },
-            {
-              $push: {
-                tracks: track._id,
-              },
-            }
-          );
+          });
+
+        console.log(playlist);
+        if (playlist) {
+          response.send(playlist);
+        } else next(new HttpException("Playlist not found", 404));
+      } else next(new HttpException("Track not found", 404));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteTrackOfPlaylist(
+    request: RequestWithUser,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      const body = request.body;
+      const id = request.params.slug as string;
+      const trackSlug = request.params.trackSlug as string;
+
+      console.log(body);
+      console.log(id);
+
+      console.log(trackSlug);
+
+      const track = await PlaylistController.trackModel
+        .findOne({ slug: trackSlug })
+        .populate("author");
+
+      if (track) {
+        const playlist =
+          await PlaylistController.playlistModel.findByIdAndRemove(id, {
+            $pull: {
+              tracks: track._id,
+            },
+          });
         if (playlist) {
           response.send(playlist);
         } else next(new HttpException("Playlist not found", 404));

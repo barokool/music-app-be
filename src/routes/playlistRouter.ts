@@ -9,12 +9,13 @@ const playlistController = new PlaylistController();
 playlistRouter.get("/", playlistController.getAllPlaylists);
 // playlistRouter.get("/detail/:slug", trackController.getTrackBySlug);
 // post("/:slug/track")
+playlistRouter.post("/", authMiddleware, playlistController.createPlaylist);
 playlistRouter.post(
-  "/:slug/track",
+  "/:slug/track/:trackSlug",
   authMiddleware,
   playlistController.updateTrackToPlaylist
 );
-playlistRouter.post("/", authMiddleware, playlistController.createPlaylist);
+playlistRouter.delete("/:slug/track", playlistController.deleteTrackOfPlaylist);
 //   .delete("/", trackController.delete);
 
 //edit a track

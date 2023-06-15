@@ -1,8 +1,2 @@
-up:
-docker-compose up -d
-
-up-prod:
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
-
-down:
-docker-compose down
+step 1 : yarn
+step 2 : docker-compose up -d
