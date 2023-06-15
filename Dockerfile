@@ -14,4 +14,4 @@ FROM base as production
 ENV NODE_PATH=./build
 EXPOSE 8000
 
-RUN npm run build
+RUN yarn start
