@@ -20,27 +20,23 @@ class TrackService {
     keyword?: string,
     options?: FilterQuery<Track>
   ) {
+    let tracks = [] as any[];
     if (keyword) {
       const normalizedKeyword = unorm
         .nfd(keyword)
         .replace(/[\u0300-\u036f]/g, "");
-
-      console.log({ normalizedKeyword });
-
-      options = {
-        ...options,
-        title: {
-          $regex: normalizedKeyword,
-          $options: "i",
-        },
-      };
+      tracks = await this.trackModel
+        .find({ title: { $regex: `${normalizedKeyword}`, $options: "i" } })
+        .populate("author")
+        .limit(limit)
+        .skip(skip);
+    } else {
+      tracks = await this.trackModel
+        .find()
+        .populate("author")
+        .limit(limit)
+        .skip(skip);
     }
-
-    const tracks = await this.trackModel
-      .find({ options })
-      .populate("author")
-      .limit(limit)
-      .skip(skip);
 
     const length = await this.trackModel.countDocuments(options);
 
