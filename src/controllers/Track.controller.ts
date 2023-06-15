@@ -2,11 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import { TrackService } from "../services/Track.service";
 import path from "path";
 import cloudinary from "cloudinary";
+import RequestWithUser from "interfaces/requestWithUser.interface";
+import { User } from "models/User/interface";
 
 cloudinary.v2.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: "dwoa7xykg",
+  api_key: "912685791654311",
+  api_secret: "zb7wd75IwZHhZpBQSLxGBsYWlck",
 });
 
 class TrackController {
@@ -25,22 +27,19 @@ class TrackController {
     }
   }
 
-  async uploadCloudinary(file: any) {
-    console.log(file);
-    const result = await cloudinary.v2.uploader.upload(file);
+  static async uploadCloudinary(file: any) {
+    const result = await cloudinary.v2.uploader.upload(file, {
+      resource_type: "auto",
+    });
 
-    console.log(result);
     return result;
   }
 
   async upload(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("hihihi");
       const file = req.file?.path;
 
-      console.log(file);
-      // error ham nay
-      const result = await this.uploadCloudinary(file);
+      const result = await TrackController.uploadCloudinary(file);
       res.json({ url: result.secure_url });
     } catch (error) {
       console.log(`Error upload image ${error}`);
@@ -90,6 +89,22 @@ class TrackController {
       const slug = request.params.slug as string;
       console.log({ slug });
       const track = await this.trackService.getTrackBySlug(slug);
+      if (track) response.send(track);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public createTrack = async (
+    request: RequestWithUser,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const track = await this.trackService.createTrack(
+        request.user as User,
+        request.body
+      );
       if (track) response.send(track);
     } catch (error) {
       next(error);

@@ -4,9 +4,16 @@ import { CreatePlaylistDto } from "../models/Playlist/dto";
 import { PlaylistService } from "../services/Playlist.service";
 import RequestWithUser from "interfaces/requestWithUser.interface";
 import { User } from "models/User/interface";
+import { TrackService } from "../services/Track.service";
+import PlaylistModel from "../models/Playlist/model";
+import TrackModel from "../models/Track/model";
+import mongoose from "mongoose";
 
 class PlaylistController {
   public playlistService = new PlaylistService();
+  public trackService = new TrackService();
+  static playlistModel = PlaylistModel;
+  static trackModel = TrackModel;
 
   public getAllPlaylists = async (
     request: Request,
@@ -49,6 +56,40 @@ class PlaylistController {
       next(error);
     }
   };
+
+  async updateTrackToPlaylist(
+    request: RequestWithUser,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      const body = request.body;
+      const id = request.params.id as string;
+      const trackSlug = body.slug;
+      const track = await PlaylistController.trackModel
+        .findOne({ slug: trackSlug })
+        .populate("author");
+
+      if (track) {
+        const playlist =
+          await PlaylistController.playlistModel.findOneAndUpdate(
+            {
+              id: id,
+            },
+            {
+              $push: {
+                tracks: track._id,
+              },
+            }
+          );
+        if (playlist) {
+          response.send(playlist);
+        } else next(new HttpException("Playlist not found", 404));
+      } else next(new HttpException("Track not found", 404));
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export { PlaylistController };

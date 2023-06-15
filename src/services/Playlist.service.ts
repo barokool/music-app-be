@@ -2,7 +2,7 @@ import { User } from "models/User/interface";
 import { CreatePlaylistDto } from "../models/Playlist/dto";
 import { Playlist } from "../models/Playlist/interface";
 import PlaylistModel from "../models/Playlist/model";
-import { FilterQuery } from "mongoose";
+import { FilterQuery, UpdateQuery } from "mongoose";
 import unorm from "unorm";
 
 class PlaylistService {
@@ -44,7 +44,7 @@ class PlaylistService {
 
     const playlists = await this.playlistModel
       .find({ options })
-      .populate("author")
+      .populate(["author", "tracks"])
       .limit(limit)
       .skip(skip);
 
@@ -53,6 +53,18 @@ class PlaylistService {
       data: playlists,
       length,
     };
+  }
+
+  async updatePlaylist(
+    filter: FilterQuery<Playlist>,
+    optionUpdate: UpdateQuery<Playlist>
+  ) {
+    const playlistUpdated = await this.playlistModel.findOneAndUpdate(
+      filter,
+      optionUpdate
+    );
+
+    return playlistUpdated;
   }
 }
 

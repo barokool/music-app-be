@@ -1,8 +1,6 @@
 import * as mongoose from "mongoose";
 import { Track } from "./interface";
-import slug from "mongoose-slug-generator";
-
-mongoose.plugin(slug);
+import slugify from "slugify";
 
 const trackSchema = new mongoose.Schema(
   {
@@ -21,11 +19,7 @@ const trackSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    slug: {
-      type: String,
-      slug: ["title", "artist"],
-      unique: true,
-    },
+    slug: String,
   },
   {
     toJSON: {
@@ -33,6 +27,19 @@ const trackSchema = new mongoose.Schema(
     },
   }
 );
+
+trackSchema.pre("save", function (next) {
+  const slugOptions = {
+    lower: true,
+    strict: true,
+    remove: /[^\x00-\x7F]/g,
+  };
+  this.slug = slugify(
+    this.title + "-" + Math.round(Math.random() * 100),
+    slugOptions
+  );
+  next();
+});
 
 const trackModel = mongoose.model<Track & mongoose.Document>(
   "Track",

@@ -8,6 +8,12 @@ const playlistController = new PlaylistController();
 
 playlistRouter.get("/", playlistController.getAllPlaylists);
 // playlistRouter.get("/detail/:slug", trackController.getTrackBySlug);
+// post("/:slug/track")
+playlistRouter.post(
+  "/:slug/track",
+  authMiddleware,
+  playlistController.updateTrackToPlaylist
+);
 playlistRouter.post("/", authMiddleware, playlistController.createPlaylist);
 //   .delete("/", trackController.delete);
 

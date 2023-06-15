@@ -19,12 +19,14 @@ const trackRouter = Router();
 const trackController = new TrackController();
 
 trackRouter.get("/", trackController.getAllTracks);
-trackRouter.post("/uploaded", upload.single("file"), trackController.upload);
 trackRouter.get("/detail/:slug", trackController.getTrackBySlug);
 trackRouter.get("/audio/:filename", trackController.getFileAudio);
+trackRouter.post("/uploaded", upload.single("file"), trackController.upload);
+
 trackRouter
   .all("/*", authMiddleware)
-  .delete("/delete/:slug", trackController.delete);
+  .post("/", trackController.createTrack)
+  .delete("/:slug", trackController.delete);
 
 //edit a track
 export { trackRouter };
